@@ -13,3 +13,46 @@ yarn-error.log*
 pnpm-debug.log*
 
 .DS_Store
+
+# Dependencies
+node_modules/
+services/*/node_modules/
+
+# Build outputs
+dist/
+build/
+bin/
+tmp/
+coverage/
+services/*/dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+services/*/.env
+services/*/.env.*
+!services/*/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Storage runtime files
+storage/uploads/*
+storage/processed/*
+storage/thumbnails/*
+storage/hls/*
+!storage/uploads/.gitkeep
+!storage/processed/.gitkeep
+!storage/thumbnails/.gitkeep
+!storage/hls/.gitkeep
