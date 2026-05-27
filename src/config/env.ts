@@ -1,21 +1,41 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+dotenv.config({
+  path: path.resolve(__dirname, "../../.env"),
+});
+
+const requiredEnv = (key: string): string => {
+  const value = process.env[key];
+
+  if (!value) {
+    throw new Error(`${key} is missing in .env`);
+  }
+
+  return value;
+};
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  apiPort: Number(process.env.API_PORT ?? process.env.PORT ?? 3000),
-  jwtSecret: process.env.JWT_SECRET ?? 'change-me',
-  storageRoot: process.env.STORAGE_ROOT ?? 'storage',
+  nodeEnv: requiredEnv("NODE_ENV"),
+  apiPort: Number(requiredEnv("API_PORT")),
+  jwtSecret: requiredEnv("JWT_SECRET"),
+  storageRoot: requiredEnv("STORAGE_ROOT"),
+
   postgres: {
-    host: process.env.POSTGRES_HOST ?? 'localhost',
-    port: Number(process.env.POSTGRES_PORT ?? 5432),
-    database: process.env.POSTGRES_DB ?? 'streamforge',
-    user: process.env.POSTGRES_USER ?? 'streamforge',
-    password: process.env.POSTGRES_PASSWORD ?? 'streamforge'
+    host: requiredEnv("POSTGRES_HOST"),
+    port: Number(requiredEnv("POSTGRES_PORT")),
+    database: requiredEnv("POSTGRES_DB"),
+    user: requiredEnv("POSTGRES_USER"),
+    password: requiredEnv("POSTGRES_PASSWORD"),
   },
+
   redis: {
-    host: process.env.REDIS_HOST ?? 'localhost',
-    port: Number(process.env.REDIS_PORT ?? 6379)
-  }
+    host: requiredEnv("REDIS_HOST"),
+    port: Number(requiredEnv("REDIS_PORT")),
+  },
 };
