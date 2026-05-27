@@ -1,31 +1,34 @@
-export type User = {
-  id: string;
-  email: string;
-  password: string;
-  createdAt: string;
+import { dbConfig } from "../config/db.ts";
+
+export const createUser = async (
+  name: string,
+  email: string,
+  password: string
+) => {
+  const result = await dbConfig.query(
+    `INSERT INTO users (name, email, password)
+     VALUES ($1, $2, $3)
+     RETURNING id, name, email`,
+    [name, email, password]
+  );
+
+  return result.rows[0];
 };
 
-const users = new Map<string, User>();
+export const getUserName = async (id: string) => {
+  const result = await dbConfig.query(
+    `SELECT name FROM users WHERE id = $1`,
+    [id]
+  );
 
-export function createUser(email: string, password: string) {
-  const existing = findUserByEmail(email);
-  if (existing) {
-    const error = new Error('User already exists') as Error & { statusCode?: number };
-    error.statusCode = 409;
-    throw error;
-  }
+  return result.rows[0];
+};
 
-  const user: User = {
-    id: crypto.randomUUID(),
-    email,
-    password,
-    createdAt: new Date().toISOString()
-  };
+export const findUserByEmail = async (email: string) => {
+  const result = await dbConfig.query(
+    `SELECT * FROM users WHERE email = $1`,
+    [email]
+  );
 
-  users.set(user.id, user);
-  return user;
-}
-
-export function findUserByEmail(email: string) {
-  return Array.from(users.values()).find((user) => user.email === email) ?? null;
-}
+  return result.rows[0];
+};

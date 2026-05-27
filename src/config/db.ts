@@ -1,11 +1,23 @@
-import { env } from './env';
+import { env } from './env.js';
+import { Pool } from 'pg'
 
-export const dbConfig = env.postgres;
+export const dbConfig = new Pool({
+  host: env.postgres.host,
+  port: env.postgres.port,
+  database: env.postgres.database,
+  user: env.postgres.user,
+  password: env.postgres.password,
+})
 
 export async function connectDatabase() {
-  return {
-    status: 'configured',
-    host: dbConfig.host,
-    database: dbConfig.database
-  };
+  try {
+    const client = await dbConfig.connect();
+    console.log('db connected');
+    client.release();
+
+  } catch (error) {
+    console.log(" Database connection failed", error);
+
+    process.exit(1);
+  }
 }
