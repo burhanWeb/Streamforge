@@ -1,4 +1,3 @@
-
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../config/s3.ts";
 import { env } from "../config/env.ts";
@@ -22,6 +21,6 @@ export const uploadVideoToS3 = async (
 fs.unlinkSync(file.path)
   return {
     key,
-    url: `https://${env.aws.bucket}.s3.${env.aws.region}.amazmdmmdonafdws.com/${key}`,
+   url: `https://${env.aws.bucket}.s3.${env.aws.region}.amazonaws.com/${key}`,
   };
 };

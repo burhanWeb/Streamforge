@@ -1,25 +1,25 @@
 import amqp from "amqplib";
+import { env } from "./env.ts";
 
-let channel: amqp.Channel;
+export async function getRabbitChannel() {
+  const url = env.rabbitMq.url;
 
-export async function connectRabbitMQ() {
-  const connection = await amqp.connect(
-    "amqp://guest:guest@localhost:5672"
-  );
+  for (let i = 1; i <= 10; i++) {
+    try {
+      const connection = await amqp.connect(url);
+      const channel = await connection.createChannel();
 
-  channel = await connection.createChannel();
-
-  await channel.assertQueue("video_transcode_queue", {
-    durable: true,
-  });
-
-  console.log("RabbitMQ connected");
-}
-
-export function getRabbitChannel(): amqp.Channel {
-  if (!channel) {
-    throw new Error("RabbitMQ channel not initialized");
+      console.log("RabbitMQ connected");
+      return { connection, channel };
+    } catch (err) {
+      console.log(`RabbitMQ not ready, retrying ${i}/10`);
+      await new Promise((res) => setTimeout(res, 3000));
+    }
   }
 
-  return channel;
+  throw new Error("RabbitMQ connection failed");
+}
+
+export async function connectRabbitMQ() {
+  return getRabbitChannel();
 }
