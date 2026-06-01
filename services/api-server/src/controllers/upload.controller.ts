@@ -3,7 +3,7 @@ import { createVideoUpload } from "../services/upload.service.ts";
 import { createVideo } from "../repositories/video.repository.ts";
 import { publishTranscodeJob } from "../services/queue.service.ts";
 interface AuthRequest extends Request {
-  user?: { userId: string };
+  user?: { userId: string; email: string };
 }
 
 export const uploadVideo = async (
@@ -12,14 +12,7 @@ export const uploadVideo = async (
 ) => {
   try {
     const file = req.file;
-    const userId = req.user?.userId;
 
-    // if (!userId) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Unauthorized",
-    //   });
-    // }
 
     if (!file) {
       return res.status(400).json({
@@ -52,7 +45,7 @@ await publishTranscodeJob({
       data: video,
     });
   } catch (error: any) {
-    console.error(error);
+    console.log(error);
 
     return res.status(500).json({
       success: false,

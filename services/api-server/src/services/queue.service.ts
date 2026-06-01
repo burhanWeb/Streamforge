@@ -4,7 +4,7 @@ export async function publishTranscodeJob(data: {
   videoId: string;
   raws3Key: string;
 }) {
-  const channel = getRabbitChannel();
+  const { channel } = await getRabbitChannel();
 
   const message = Buffer.from(JSON.stringify(data));
 
