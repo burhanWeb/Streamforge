@@ -3,10 +3,17 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+
     "allowImportingTsExtensions": true,
+
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+
+    "skipLibCheck": true,
+    "types": ["node", "multer"]
   },
   "ts-node": {
     "esm": true
