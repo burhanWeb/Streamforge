@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
     restart: unless-stopped
 
@@ -36,6 +36,64 @@ services:
 
     restart: unless-stopped
 
+  transcoder-worker:
+    build:
+      context: ./services/transcoder-worker
+      dockerfile: DockerFile
+
+    container_name: streamforge-transcoder-worker
+
+    environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/
+      QUEUE_NAME: ${QUEUE_NAME}
+      AWS_REGION: ${AWS_REGION}
+      RAW_BUCKET: ${RAW_BUCKET}
+      TRANSCODED_BUCKET: ${TRANSCODED_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+    depends_on:
+      - rabbitmq
+
+    restart: unless-stopped
+  api-server:
+    build:
+      context: ./services/api-server
+      dockerfile: DockerFile
+    container_name: streamforge-api-server
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    volumes:
+      - ./services/api-server:/app
+      - /app/node_modules
+      - /app/services/api-server/node_modules
+
+    environment:
+      NODE_ENV: development
+      API_PORT: ${API_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      STORAGE_ROOT: ${STORAGE_ROOT}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      RAW_BUCKET: ${RAW_BUCKET}
+
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      QUEUE_NAME: video_transcode_queue
+    
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: unless-stopped
+
 volumes:
   postgres_data:
-  redis_data:

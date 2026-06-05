@@ -26,9 +26,9 @@ export const uploadVideo = async (
     const generatedTitle = file.originalname
       .split(".")[0]
       .replace(/[-_]/g, " ");
-
+const userId = req.user?.userId 
     const video = await createVideo({
-      userId:"5915aa6b-76d4-4df1-9531-4f42df77d34c",
+      userId:userId!,
       title: generatedTitle,
       originalFilename: file.originalname,
       mimeType: file.mimetype,
