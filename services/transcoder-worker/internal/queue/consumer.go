@@ -66,24 +66,35 @@ func StartConsumer(cfg config.Config, s3Store *storage.S3Storage) {
 	}
 
 	fmt.Println("Worker is waiting for jobs...")
+maxConcurrentJobs := 2
 
-	for msg := range msgs {
+semaphore := make(chan struct{}, maxConcurrentJobs)
+
+for msg := range msgs {
+	semaphore <- struct{}{} // take slot
+
+	go func(msg amqp091.Delivery) {
+		defer func() {
+			<-semaphore // release slot
+		}()
+
 		var job models.TranscodeJob
 
 		err := json.Unmarshal(msg.Body, &job)
 		if err != nil {
 			fmt.Println("Invalid job:", err)
 			msg.Nack(false, false)
-			continue
+			return
 		}
 
 		err = processors.ProcessTranscodeJob(job, s3Store)
 		if err != nil {
 			fmt.Println("Job failed:", err)
 			msg.Nack(false, true)
-			continue
+			return
 		}
 
 		msg.Ack(false)
-	}
+	}(msg)
+}
 }
