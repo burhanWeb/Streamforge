@@ -6,10 +6,12 @@ import { connectRabbitMQ } from "./config/rabbitmq.ts";
 async function start() {
   await connectDatabase();
   await connectRabbitMQ();
+const PORT = Number(process.env.API_PORT) || 3000;
 
-  app.listen(env.apiPort, () => {
-    console.log(`Server running on port ${env.apiPort}`);
-  });
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
 }
 
 start();

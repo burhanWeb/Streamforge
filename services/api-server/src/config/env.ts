@@ -46,7 +46,7 @@ export const env = {
   region: requiredEnv("AWS_REGION"),
   accessKeyId: requiredEnv("AWS_ACCESS_KEY_ID"),
   secretAccessKey: requiredEnv("AWS_SECRET_ACCESS_KEY"),
-  bucket:requiredEnv("AWS_S3_BUCKET"),
+  bucket:requiredEnv("RAW_BUCKET"),
 },
 rabbitMq:{
   url: requiredEnv("RABBITMQ_URL"),
